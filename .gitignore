@@ -1,0 +1,11 @@
+data/
+outputs/
+*.csv
+*.xlsx
+*.xls
+*.png
+.venv/
+__pycache__/
+*.pyc
+.env
+.DS_Store
