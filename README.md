@@ -34,6 +34,8 @@ Requires Python 3.11 or newer.
     python3 -m venv .venv
     .venv/bin/python -m pip install -r requirements.txt
 
+`.venv` is deleted after each run (see [Clean up](#clean-up-after-each-run)). To rebuild it on Windows in one line: `python -m venv .venv; .\.venv\Scripts\pip install -r requirements.txt`
+
 ## Run
 
 **Windows (PowerShell)**
@@ -56,7 +58,17 @@ The first run downloads about 50 MB from the World Bank and takes a minute or so
 - `outputs/usa_kenya_by_instrument_2025Q3.csv`: USA corridor by payment instrument
 - `data/raw/`: the downloaded Excel files, plus two small CSV extracts of the RPW sheet (a cache)
 
+Outputs are never committed: after each run they are copied to Google Drive (Reports), not to this repo.
+
 The charts are 300 dpi PNGs in the same style as [kenya-remittances-2026](https://github.com/eokinyo/kenya-remittances-2026). Every chart's footer reads "Source: World Bank, Remittance Prices Worldwide. Chart: Elly Okinyo."
+
+## Clean up (after each run)
+
+`clean.ps1` keeps the local clone slim. It deletes `.venv`, `__pycache__`, `.pytest_cache`, `.mypy_cache`, the `data/` downloads and the local `outputs/` folder, never touches tracked files, prints the MB freed, and is safe to rerun. Copy the outputs somewhere else first if you need them. From the repo folder in PowerShell:
+
+    .\clean.ps1
+
+(Add `-DryRun` to see what would be removed without deleting anything. If script execution is blocked, use `powershell -ExecutionPolicy Bypass -File .\clean.ps1`.) Rebuild the venv with the one-line command under Setup before the next run.
 
 ## Method notes
 
