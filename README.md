@@ -2,7 +2,7 @@
 
 Code to reproduce the charts and numbers in the article [The 1% US tax is not the biggest cost of sending money to Kenya](https://ellyokinyo.com/writing/kenya-remittance-costs-2026.html) by Elly Okinyo (3 October 2026).
 
-The repository holds code only. No data files are committed: the script downloads the data from the World Bank and the Central Bank of Kenya each time it runs (and caches it in `data/`, which is git-ignored). No API keys needed.
+The repository holds code only. No data files are committed: the script downloads the data from the World Bank and the Central Bank of Kenya each time it runs and caches it outside the project folder (see [Where things live](#where-things-live)). No API keys needed.
 
 ## What it reproduces
 
@@ -18,37 +18,33 @@ The repository holds code only. No data files are committed: the script download
    - CBK, August 2026: Tanzania (US$11.72m) vs Saudi Arabia (US$11.61m)
 3. **Chart** the two figures in the article.
 
-## Setup (once)
+## Where things live
 
-Requires Python 3.11 or newer.
+- **Code:** this repo. The project folder needs only the scripts, this README, `requirements.txt`, `clean.ps1` and `LICENSE`; the run adds `outputs/`.
+- **Virtual environment:** `%LOCALAPPDATA%\venvs\kenya-remittance-costs`, outside the project folder. If you keep the project in a cloud-synced folder, keep `.git`, the venv and the data cache out of it: sync can corrupt git and small-file trees.
+- **Download cache:** `%LOCALAPPDATA%\project-data\kenya-remittance-costs\raw\` (on macOS/Linux `~/.cache/project-data/kenya-remittance-costs/raw/`; set `KRC_DATA_DIR` to override).
 
-**Windows (PowerShell)**
+## Run (Windows PowerShell)
+
+Requires Python 3.11 or newer (the `py` launcher). From the project folder:
 
     cd path\to\kenya-remittance-costs
-    python -m venv .venv
-    .venv\Scripts\python -m pip install -r requirements.txt
+    py -m venv $env:LOCALAPPDATA\venvs\kenya-remittance-costs
+    & $env:LOCALAPPDATA\venvs\kenya-remittance-costs\Scripts\python -m pip install -r requirements.txt
+    & $env:LOCALAPPDATA\venvs\kenya-remittance-costs\Scripts\python remittance_costs.py
+    .\clean.ps1
 
-**macOS / Linux (Terminal)**
+Delete the venv after the run to save space: the last line removes it and the download cache (see [Clean up](#clean-up-after-a-run)). To rebuild the venv in one line: `py -m venv $env:LOCALAPPDATA\venvs\kenya-remittance-costs; & $env:LOCALAPPDATA\venvs\kenya-remittance-costs\Scripts\pip install -r requirements.txt`
+
+A run downloads about 50 MB from the World Bank and takes a minute or so to read the Excel sheet. If the cache is still there, later runs reuse it and take a few seconds; add `--refresh` to download again.
+
+## Run (macOS / Linux)
 
     cd path/to/kenya-remittance-costs
-    python3 -m venv .venv
-    .venv/bin/python -m pip install -r requirements.txt
-
-`.venv` is deleted after each run (see [Clean up](#clean-up-after-each-run)). To rebuild it on Windows in one line: `python -m venv .venv; .\.venv\Scripts\pip install -r requirements.txt`
-
-## Run
-
-**Windows (PowerShell)**
-
-    .venv\Scripts\python remittance_costs.py
-
-**macOS / Linux**
-
-    .venv/bin/python remittance_costs.py
-
-(If you prefer to activate the venv first: `.venv\Scripts\Activate.ps1` on Windows, `source .venv/bin/activate` on macOS/Linux, then `python remittance_costs.py`.)
-
-The first run downloads about 50 MB from the World Bank and takes a minute or so to read the Excel sheet. Later runs reuse the cached files and take a few seconds; add `--refresh` to download them again.
+    python3 -m venv ~/.cache/venvs/kenya-remittance-costs
+    ~/.cache/venvs/kenya-remittance-costs/bin/python -m pip install -r requirements.txt
+    ~/.cache/venvs/kenya-remittance-costs/bin/python remittance_costs.py
+    rm -rf ~/.cache/venvs/kenya-remittance-costs ~/.cache/project-data/kenya-remittance-costs
 
 ## Outputs (created next to the script)
 
@@ -56,19 +52,18 @@ The first run downloads about 50 MB from the World Bank and takes a minute or so
 - `outputs/charts/2_kenya_corridor_costs.png` (Figure 2): corridor averages to Kenya by sending country, Q2 2016 to Q3 2025, in two panels (USA, UK, Canada; Tanzania, Rwanda, South Africa)
 - `outputs/kenya_corridor_costs.csv`: quarter, sending country, mean, median and number of services
 - `outputs/usa_kenya_by_instrument_2025Q3.csv`: USA corridor by payment instrument
-- `data/raw/`: the downloaded Excel files, plus two small CSV extracts of the RPW sheet (a cache)
 
-Outputs are never committed: after each run they are copied to Google Drive (Reports), not to this repo.
+Outputs are never committed.
 
 The charts are 300 dpi PNGs in the same style as [kenya-remittances-2026](https://github.com/eokinyo/kenya-remittances-2026). Every chart's footer reads "Source: World Bank, Remittance Prices Worldwide. Chart: Elly Okinyo."
 
-## Clean up (after each run)
+## Clean up (after a run)
 
-`clean.ps1` keeps the local clone slim. It deletes `.venv`, `__pycache__`, `.pytest_cache`, `.mypy_cache`, the `data/` downloads and the local `outputs/` folder, never touches tracked files, prints the MB freed, and is safe to rerun. Copy the outputs somewhere else first if you need them. From the repo folder in PowerShell:
+`clean.ps1` frees disk space after a run. It deletes the venv (`%LOCALAPPDATA%\venvs\kenya-remittance-costs`), the download cache (`%LOCALAPPDATA%\project-data\kenya-remittance-costs`) and any `.venv`, `__pycache__`, `.pytest_cache`, `.mypy_cache` or `data/` inside the project folder. It keeps `outputs/` and never touches files tracked by git. It prints the MB freed and is safe to rerun. From the project folder in PowerShell:
 
     .\clean.ps1
 
-(Add `-DryRun` to see what would be removed without deleting anything. If script execution is blocked, use `powershell -ExecutionPolicy Bypass -File .\clean.ps1`.) Rebuild the venv with the one-line command under Setup before the next run.
+(Add `-DryRun` to see what would be removed without deleting anything. If script execution is blocked, use `powershell -ExecutionPolicy Bypass -File .\clean.ps1`.)
 
 ## Method notes
 
@@ -82,8 +77,8 @@ The charts are 300 dpi PNGs in the same style as [kenya-remittances-2026](https:
 
 ## If the download fails
 
-- **World Bank:** open the [RPW page on the World Bank Data Catalog](https://datacatalog.worldbank.org/search/dataset/0037898/remittance-prices-worldwide), download "Remittance Prices Worldwide (Complete Dataset)" and save it as `data/raw/rpw_dataset_2011_2025_q3.xlsx`.
-- **CBK:** open <https://www.centralbank.go.ke/diaspora-remittances/>, click "Remittances by Source ('000 USD Equivalent)" and save the file as `data/raw/August2026.xlsx`.
+- **World Bank:** open the [RPW page on the World Bank Data Catalog](https://datacatalog.worldbank.org/search/dataset/0037898/remittance-prices-worldwide), download "Remittance Prices Worldwide (Complete Dataset)" and save it as `rpw_dataset_2011_2025_q3.xlsx` in the download cache folder (`%LOCALAPPDATA%\project-data\kenya-remittance-costs\raw\`).
+- **CBK:** open <https://www.centralbank.go.ke/diaspora-remittances/>, click "Remittances by Source ('000 USD Equivalent)" and save the file as `August2026.xlsx` in the same folder.
 
 Then run the script again.
 

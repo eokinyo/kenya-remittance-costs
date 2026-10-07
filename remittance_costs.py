@@ -6,7 +6,7 @@ Reproduces the numbers and the two charts in the article "The 1% US tax is not t
 biggest cost of sending money to Kenya" (Elly Okinyo, 3 October 2026).
 
 Three steps, run in order by main():
-  1. download  - fetch the two source files (cached in data/raw/, git-ignored)
+  1. download  - fetch the two source files (cached outside the project folder, see DATA_DIR)
   2. analyse   - corridor averages, USA payment-instrument split, Tanzania detail,
                  global average, CBK Tanzania vs Saudi Arabia (CSVs in outputs/)
   3. charts    - two PNG charts (outputs/charts/)
@@ -19,6 +19,7 @@ Run:  python remittance_costs.py            (add --refresh to download again)
 """
 from __future__ import annotations
 
+import os
 import sys
 import time
 from pathlib import Path
@@ -64,7 +65,23 @@ INSTRUMENT_LABELS = {"Bank account transfer": "Bank account"}
 SOURCE_NOTE = "Source: World Bank, Remittance Prices Worldwide. Chart: Elly Okinyo."
 
 BASE_DIR = Path(__file__).resolve().parent
-RAW_DIR = BASE_DIR / "data" / "raw"
+PROJECT = "kenya-remittance-costs"
+
+
+def _data_dir() -> Path:
+    """Download cache, kept outside the project folder (so a synced project folder stays small).
+
+    KRC_DATA_DIR overrides it. Default: %LOCALAPPDATA%\\project-data\\<project> on Windows,
+    ~/.cache/project-data/<project> elsewhere. clean.ps1 deletes it after a run.
+    """
+    if os.environ.get("KRC_DATA_DIR"):
+        return Path(os.environ["KRC_DATA_DIR"])
+    base = os.environ.get("LOCALAPPDATA") or os.environ.get("XDG_CACHE_HOME") or Path.home() / ".cache"
+    return Path(base) / "project-data" / PROJECT
+
+
+DATA_DIR = _data_dir()
+RAW_DIR = DATA_DIR / "raw"
 OUT_DIR = BASE_DIR / "outputs"
 CHART_DIR = OUT_DIR / "charts"
 
@@ -77,7 +94,7 @@ USER_AGENT = "kenya-remittance-costs/1.0 (+python-requests)"
 # Step 1: download
 # --------------------------------------------------------------------------- #
 def download(url: str, page: str, refresh: bool) -> Path:
-    """Download an Excel file into data/raw/ (or reuse the cached copy)."""
+    """Download an Excel file into RAW_DIR (or reuse the cached copy)."""
     RAW_DIR.mkdir(parents=True, exist_ok=True)
     path = RAW_DIR / url.rsplit("/", 1)[-1]
     if path.exists() and not refresh:
