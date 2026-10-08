@@ -55,7 +55,7 @@ A run downloads about 50 MB from the World Bank and takes a minute or so to read
 
 Outputs are never committed.
 
-The charts are 300 dpi PNGs in the same style as [kenya-remittances-2026](https://github.com/eokinyo/kenya-remittances-2026). Every chart's footer reads "Source: World Bank, Remittance Prices Worldwide. Chart: Elly Okinyo."
+The charts are 300 dpi PNGs in the same style as [kenya-remittances-2026](https://github.com/eokinyo/kenya-remittances-2026). Every chart's footer reads "Source: World Bank, Remittance Prices Worldwide; author's calculations."
 
 ## Clean up (after a run)
 
