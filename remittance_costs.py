@@ -62,7 +62,7 @@ CORRIDORS = {  # source_code: (label, colour)
     "TZA": ("Tanzania", "#ff7f0e"), "RWA": ("Rwanda", "#9467bd"), "ZAF": ("South Africa", "#7f7f7f"),
 }
 INSTRUMENT_LABELS = {"Bank account transfer": "Bank account"}
-SOURCE_NOTE = "Source: World Bank, Remittance Prices Worldwide. Chart: Elly Okinyo."
+SOURCE_NOTE = "Source: World Bank, Remittance Prices Worldwide; author's calculations."
 
 BASE_DIR = Path(__file__).resolve().parent
 PROJECT = "kenya-remittance-costs"
