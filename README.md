@@ -1,6 +1,6 @@
 # What it costs to send money to Kenya: World Bank remittance price data
 
-Code to reproduce the charts and numbers in the article [The 1% US tax is not the biggest cost of sending money to Kenya](https://ellyokinyo.com/writing/kenya-remittance-costs-2026.html) by Elly Okinyo (3 October 2026).
+Code to reproduce the charts and numbers in the article [The 1% US tax is not the biggest cost of sending money to Kenya](https://ellyokinyo.com/writing/kenya-remittance-costs-2026.html) by Elly Okinyo (7 October 2026).
 
 The repository holds code only. No data files are committed: the script downloads the data from the World Bank and the Central Bank of Kenya each time it runs and caches it outside the project folder (see [Where things live](#where-things-live)). No API keys needed.
 
@@ -92,4 +92,4 @@ Then run the script again.
 
 ## License
 
-MIT, see [LICENSE](LICENSE).
+The code is released under the MIT License, see [LICENSE](LICENSE). The licence covers the code only. No data is included in this repository: the World Bank and Central Bank of Kenya data are downloaded at run time and remain subject to their providers' terms of use.
